@@ -1,17 +1,43 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+const http = require('http');
+const fs = require('fs');
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+http.createServer((request, response)=> {
+    if(request.url === '/write'){
+    fs.writeFile('data.txt', 'Shmulik', (err) => {
+        if(err){
+            console.log(err);
+            response.end();
+            return;
+        }
+        response.write('File created!');
+        response.end();
+    });
+}else if(request.url === '/delete'){
+fs.unlink('data.txt', (err) => {
+    if(err){
+        console.log(err);
+        response.end();
+        return;
+    }
+    response.write('File deleted!');
+    response.end();
+});
+}else if(request.url === '/dice'){
+    let num = Math.floor(Math.random() * 6 + 1);
+    if(num === 4){
+        response.write('You won!');
+        response.end();
+        return;
+    }
+    console.log(num);
+    response.write('You lost!');
+    response.end();
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+}else{
+    response.write('Unaothorized');
+    response.end();
+}
+
+}).listen(8080);
+
+console.log('Listening on: http://localhost:8080');
